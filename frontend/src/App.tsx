@@ -1,10 +1,10 @@
-import UploadSheet from './components/UploadSheet';
+import LeadBol from './components/LeadBol';
 import './App.css'
 
 function App() {
   return (
     <>
-      <UploadSheet />
+      <LeadBol />
     </>
   )
 }

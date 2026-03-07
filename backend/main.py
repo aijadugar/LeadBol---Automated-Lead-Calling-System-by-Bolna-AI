@@ -12,13 +12,19 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-BOLNA_API_KEY = "your_bolna_api_key"
-AGENT_ID = "your_agent_id"
-FROM_PHONE = "your_from_phone_number"
+BOLNA_API_KEY = "sk_test_XXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+AGENT_ID = "ag_XXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+FROM_PHONE = "+919999999999"
+
+CALL_RESULTS = {}
 
 @app.get("/")
 def home():
     return {"message": "Bolna Backend Running"}
+
+@app.get("/api/results")
+def get_results():
+    return {"results": list(CALL_RESULTS.values())}
 
 @app.post("/api/upload")
 def upload(data: dict):
@@ -48,19 +54,37 @@ def upload(data: dict):
             )
 
             response_data = response.json()
+            call_id = response_data.get("execution_id")
+            CALL_RESULTS[call_id] = {
+                "phone_number": full_phone,
+                "status": "initiated",
+                "summary": ""
+            }
+            results.append({
+                "phone_number": full_phone,
+                "call_id": call_id
+            })
 
         except Exception as e:
-            response_data = {"error": str(e)}
-
-        results.append({
-            "phone_number": full_phone,
-            "api_status_code": response.status_code,
-            "response": response_data
-        })
-
-        time.sleep(2)
+            results.append({
+                "phone_number": full_phone,
+                "error": str(e)
+            })
 
     return {
-        "total_numbers": len(leads),
-        "results": results
+        "calls": results
     }
+
+@app.post("/api/webhook")
+def bolna_webhook(data: dict):
+    # print("wehbook received:", data)
+    call_id = data.get("id")
+    phone_number = data.get("user_number")
+    status = data.get("status")
+    summary = data.get("summary")
+    CALL_RESULTS[call_id] = {
+        "phone_number": phone_number,
+        "status": status,
+        "summary": summary
+    }
+    return {"success": True}
