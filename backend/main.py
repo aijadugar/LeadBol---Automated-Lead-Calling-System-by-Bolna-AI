@@ -1,6 +1,8 @@
 from fastapi import FastAPI
-import requests, time
+import requests, time, os
 from fastapi.middleware.cors import CORSMiddleware
+from dotenv import load_dotenv 
+load_dotenv()
 
 app = FastAPI()
 
@@ -12,9 +14,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-BOLNA_API_KEY = "sk_test_XXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
-AGENT_ID = "ag_XXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
-FROM_PHONE = "+919999999999"
+BOLNA_API_KEY = os.getenv("BOLNA_API_KEY")
+AGENT_ID = os.getenv("AGENT_ID")
+FROM_PHONE = os.getenv("FROM_PHONE")
 
 CALL_RESULTS = {}
 

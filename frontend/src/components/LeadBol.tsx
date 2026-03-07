@@ -3,7 +3,7 @@ import * as XLSX from "xlsx";
 import axios from "axios";
 import * as FileSaver from "file-saver";
 
-const API_BASE = "https://stunning-space-couscous-4j7qjvvpvq9w3q756-8000.app.github.dev";
+const API_BASE = import.meta.env.VITE_BASE_URL;
 
 export default function LeadBol() {
 
