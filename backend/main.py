@@ -28,21 +28,16 @@ def get_results():
 
 @app.post("/api/upload")
 def upload(data: dict):
-
     leads = data["leads"]
     results = []
-
     for lead in leads:
-
         phone = str(lead["PHONE_NUMBER"])
         full_phone = "+91" + phone
-
         payload = {
             "agent_id": AGENT_ID,
             "recipient_phone_number": full_phone,
             "from_phone_number": FROM_PHONE
         }
-
         try:
             response = requests.post(
                 "https://api.bolna.ai/call",
@@ -52,7 +47,6 @@ def upload(data: dict):
                     "Content-Type": "application/json"
                 }
             )
-
             response_data = response.json()
             call_id = response_data.get("execution_id")
             CALL_RESULTS[call_id] = {
@@ -64,13 +58,11 @@ def upload(data: dict):
                 "phone_number": full_phone,
                 "call_id": call_id
             })
-
         except Exception as e:
             results.append({
                 "phone_number": full_phone,
                 "error": str(e)
             })
-
     return {
         "calls": results
     }

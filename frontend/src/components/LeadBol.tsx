@@ -13,98 +13,49 @@ export default function LeadBol() {
     const [fileName, setFileName] = useState("");
 
     const handleFileUpload = async (e: any) => {
-
         const file = e.target.files[0];
-
         if (!file) return;
-
         setFileName(file.name);
         setLoading(true);
         setMessage("Reading Excel file...");
-
         try {
-
             const data = await file.arrayBuffer();
-
             const workbook = XLSX.read(data);
-
             const sheet = workbook.Sheets[workbook.SheetNames[0]];
-
             const jsonData = XLSX.utils.sheet_to_json(sheet);
-
             setMessage("Uploading leads and triggering calls...");
-
-            const response = await axios.post(
-                `${API_BASE}/api/upload`,
-                { leads: jsonData }
-            );
-
+            const response = await axios.post(`${API_BASE}/api/upload`, { leads: jsonData });
             console.log("Upload response:", response.data);
-
             setMessage("Calls initiated successfully.");
-
         } catch (error) {
-
             console.error(error);
             setMessage("Upload failed.");
-
         } finally {
-
             setLoading(false);
-
         }
     };
 
     const fetchResults = async () => {
-
         setLoading(true);
         setMessage("Fetching call results...");
-
         try {
-
             const res = await axios.get(`${API_BASE}/api/results`);
-
             setResults(res.data.results || []);
-
             setMessage("Results fetched successfully.");
-
         } catch (err) {
-
             console.error(err);
             setMessage("Failed to fetch results.");
-
         } finally {
-
             setLoading(false);
-
         }
     };
 
     const downloadResults = () => {
-
         const worksheet = XLSX.utils.json_to_sheet(results);
-
         const workbook = XLSX.utils.book_new();
-
-        XLSX.utils.book_append_sheet(
-            workbook,
-            worksheet,
-            "Call Results"
-        );
-
-        const excelBuffer = XLSX.write(workbook, {
-            bookType: "xlsx",
-            type: "array"
-        });
-
-        const blob = new Blob(
-            [excelBuffer],
-            {
-                type:
-                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8"
-            }
-        );
-
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Call Results");
+        const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
+        const blob = new Blob([excelBuffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8" });
         FileSaver.saveAs(blob, "leadbol_results.xlsx");
     };
 
@@ -140,7 +91,7 @@ export default function LeadBol() {
                             boxShadow: "0 2px 6px rgba(0,0,0,0.1)"
                         }}
                     >
-                        Upload Excel File
+                        Upload Excel File (Leads with Phone Numbers)
                         <input
                             type="file"
                             accept=".xlsx,.xls"
